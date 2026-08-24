@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriChain Project Consultant - Dashboard Suite</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --pink-primary: #ec4899;
+    --pink-dark: #be185d;
+    --pink-light: #fce7f3;
+    --black: #111827;
+    --black-dark: #030712;
+    --grey-900: #1f2937;
+    --grey-800: #374151;
+    --grey-700: #4b5563;
+    --grey-600: #6b7280;
+    --grey-500: #9ca3af;
+    --grey-400: #d1d5db;
+    --grey-300: #e5e7eb;
+    --grey-200: #f3f4f6;
+    --grey-100: #f9fafb;
+    --white: #ffffff;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #ef4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body { background: var(--grey-100); color: var(--black); min-height: 100vh; }
+
+  /* ===== PAGE SYSTEM ===== */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ===== LOGIN PAGE ===== */
+  #login-page {
+    background: linear-gradient(135deg, var(--black-dark) 0%, var(--grey-900) 50%, var(--pink-dark) 100%);
+    display: none;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  #login-page.active { display: flex; }
+  .login-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1100px;
+    width: 100%;
+    background: var(--white);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+  }
+  .login-brand {
+    background: linear-gradient(135deg, var(--black) 0%, var(--grey-900) 100%);
+    padding: 4rem 3rem;
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .login-brand::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, var(--pink-primary) 0%, transparent 70%);
+    opacity: 0.3;
+  }
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 1;
+  }
+  .logo-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--pink-primary);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 900;
+  }
+  .brand-name h1 { font-size: 26px; font-weight: 800; letter-spacing: 0.5px; }
+  .brand-name p { color: var(--pink-primary); font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+  .brand-tagline { position: relative; z-index: 1; }
+  .brand-tagline h2 { font-size: 36px; font-weight: 700; line-height: 1.2; margin-bottom: 1.5rem; }
+  .brand-tagline h2 span { color: var(--pink-primary); }
+  .brand-tagline p { color: var(--grey-400); line-height: 1.7; font-size: 15px; margin-bottom: 2rem; }
+  .brand-features { display: flex; flex-direction: column; gap: 1rem; position: relative; z-index: 1; }
+  .brand-feature { display: flex; align-items: center; gap: 0.8rem; color: var(--grey-300); font-size: 14px; }
+  .feature-check {
+    width: 24px; height: 24px; background: var(--pink-primary); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+  }
+  .login-form-section { padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center; }
+  .login-header { margin-bottom: 2.5rem; }
+  .login-header h2 { font-size: 28px; font-weight: 800; color: var(--black); margin-bottom: 0.5rem; }
+  .login-header p { color: var(--grey-600); font-size: 14px; }
+  .form-group { margin-bottom: 1.3rem; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--grey-700); margin-bottom: 0.5rem; }
+  .form-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--grey-300);
+    border-radius: 12px;
+    font-size: 14px;
+    transition: all 0.2s;
+    outline: none;
+  }
+  .form-input:focus { border-color: var(--pink-primary); box-shadow: 0 0 0 4px var(--pink-light); }
+  .form-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .remember { display: flex; align-items: center; gap: 0.5rem; font-size: 13px; color: var(--grey-600); cursor: pointer; }
+  .forgot-link { font-size: 13px; color: var(--pink-primary); font-weight: 600; text-decoration: none; }
+  .btn-login {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--pink-primary), var(--pink-dark));
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 24px rgba(236,72,153,0.35);
+  }
+  .btn-login:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(236,72,153,0.45); }
+  .login-alt { text-align: center; margin-top: 2rem; font-size: 13px; color: var(--grey-600); }
+
+  /* ===== MAIN LAYOUT ===== */
+  .app-layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, var(--black-dark) 0%, var(--grey-900) 100%);
+    color: var(--white);
+    padding: 1.5rem 0;
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 50;
+    border-right: 3px solid var(--pink-primary);
+  }
+  .sidebar-brand {
+    padding: 0 1.5rem 1.5rem;
+    border-bottom: 1px solid var(--grey-800);
+    margin-bottom: 1rem;
+  }
+  .sidebar-brand-inner { display: flex; align-items: center; gap: 0.8rem; }
+  .sidebar-logo {
+    width: 44px; height: 44px;
+    background: var(--pink-primary);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 20px;
+  }
+  .sidebar-brand-text h3 { font-size: 16px; font-weight: 800; }
+  .sidebar-brand-text p { font-size: 11px; color: var(--pink-primary); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+  .nav-menu { padding: 0 0.8rem; }
+  .nav-section { padding: 0.8rem; font-size: 11px; font-weight: 700; color: var(--grey-500); letter-spacing: 1.5px; text-transform: uppercase; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 12px 14px;
+    margin-bottom: 4px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: var(--grey-400);
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .nav-item:hover { background: rgba(236,72,153,0.1); color: var(--white); }
+  .nav-item.active {
+    background: linear-gradient(135deg, var(--pink-primary), var(--pink-dark));
+    color: var(--white);
+    box-shadow: 0 4px 16px rgba(236,72,153,0.35);
+  }
+  .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+
+  .main-content { margin-left: 260px; flex: 1; display: flex; flex-direction: column; }
+  .topbar {
+    background: var(--white);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--grey-200);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+  .page-title h2 { font-size: 22px; font-weight: 800; color: var(--black); }
+  .page-title p { font-size: 13px; color: var(--grey-600); margin-top: 2px; }
+  .topbar-actions { display: flex; align-items: center; gap: 1rem; }
+  .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-box input {
+    padding: 10px 14px 10px 40px;
+    border: 1px solid var(--grey-300);
+    border-radius: 10px;
+    width: 280px;
+    font-size: 13px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .search-box input:focus { border-color: var(--pink-primary); }
+  .search-icon { position: absolute; left: 12px; color: var(--grey-500); font-size: 14px; }
+  .notification-bell {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--grey-100);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    position: relative;
+    color: var(--grey-700);
+  }
+  .notification-bell::after {
+    content: '5';
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 16px; height: 16px;
+    background: var(--pink-primary);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .user-profile {
+    display: flex; align-items: center; gap: 0.8rem;
+    padding: 6px 12px 6px 6px;
+    border: 1px solid var(--grey-200);
+    border-radius: 40px;
+    cursor: pointer;
+  }
+  .user-avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--pink-primary), var(--pink-dark));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white);
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .user-info h4 { font-size: 13px; font-weight: 700; color: var(--black); }
+  .user-info p { font-size: 11px; color: var(--grey-500); }
+
+  .content-area { padding: 2rem; flex: 1; }
+
+  /* ===== SCREEN DESCRIPTION BAR ===== */
+  .screen-desc {
+    background: linear-gradient(135deg, var(--pink-light) 0%, var(--white) 100%);
+    border-left: 4px solid var(--pink-primary);
+    padding: 1.2rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+  }
+  .screen-desc h4 { color: var(--pink-dark); font-size: 14px; font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .screen-desc p { color: var(--grey-700); font-size: 13px; line-height: 1.6; }
+  .screen-desc .meta-row { display: flex; gap: 2rem; margin-top: 0.8rem; flex-wrap: wrap; }
+  .screen-desc .meta-item { font-size: 12px; color: var(--grey-600); }
+  .screen-desc .meta-item strong { color: var(--grey-900); }
+
+  /* ===== KPI CARDS ===== */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+  .kpi-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--grey-200);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, var(--pink-primary), var(--pink-dark));
+  }
+  .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); }
+  .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+  .kpi-label { font-size: 13px; color: var(--grey-600); font-weight: 600; }
+  .kpi-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .kpi-icon.pink { background: var(--pink-light); color: var(--pink-primary); }
+  .kpi-icon.green { background: #d1fae5; color: var(--green); }
+  .kpi-icon.amber { background: #fef3c7; color: var(--amber); }
+  .kpi-icon.red { background: #fee2e2; color: var(--red); }
+  .kpi-value { font-size: 32px; font-weight: 900; color: var(--black); margin-bottom: 0.4rem; }
+  .kpi-change { display: flex; align-items: center; gap: 0.3rem; font-size: 12px; font-weight: 600; }
+  .kpi-change.up { color: var(--green); }
+  .kpi-change.down { color: var(--red); }
+  .kpi-sub { font-size: 12px; color: var(--grey-500); margin-top: 0.3rem; }
+
+  /* ===== CHARTS & ROWS ===== */
+  .grid-row { display: grid; gap: 1.5rem; margin-bottom: 2rem; }
+  .grid-row.cols-2 { grid-template-columns: 2fr 1fr; }
+  .grid-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .grid-row.cols-equal { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 1100px) {
+    .grid-row.cols-2, .grid-row.cols-3, .grid-row.cols-equal { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--grey-200);
+  }
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .card-title { font-size: 16px; font-weight: 800; color: var(--black); display: flex; align-items: center; gap: 0.5rem; }
+  .card-title::before {
+    content: '';
+    width: 4px; height: 20px;
+    background: var(--pink-primary);
+    border-radius: 2px;
+  }
+  .card-action {
+    padding: 8px 14px;
+    background: var(--grey-100);
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--grey-700);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .card-action:hover { background: var(--pink-light); color: var(--pink-primary); }
+  .card-action.primary { background: linear-gradient(135deg, var(--pink-primary), var(--pink-dark)); color: var(--white); }
+  .card-action.primary:hover { opacity: 0.9; }
+  .chart-container { position: relative; height: 280px; }
+
+  /* ===== TRAFFIC LIGHT BADGES ===== */
+  .badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.3rem; }
+  .badge.green { background: #d1fae5; color: #065f46; }
+  .badge.amber { background: #fef3c7; color: #92400e; }
+  .badge.red { background: #fee2e2; color: #991b1b; }
+  .badge.grey { background: var(--grey-200); color: var(--grey-700); }
+  .badge.pink { background: var(--pink-light); color: var(--pink-dark); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .status-dot.green { background: var(--green); }
+  .status-dot.amber { background: var(--amber); }
+  .status-dot.red { background: var(--red); }
+
+  /* ===== TABLES ===== */
+  .table-container { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--grey-100); }
+  th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--grey-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--grey-200);
+  }
+  td {
+    padding: 14px;
+    font-size: 13px;
+    color: var(--grey-800);
+    border-bottom: 1px solid var(--grey-100);
+  }
+  tr:hover td { background: var(--grey-50); }
+  .progress-bar-wrap { background: var(--grey-200); height: 8px; border-radius: 4px; overflow: hidden; min-width: 100px; }
+  .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+  .progress-bar-fill.green { background: var(--green); }
+  .progress-bar-fill.amber { background: var(--amber); }
+  .progress-bar-fill.red { background: var(--red); }
+  .progress-bar-fill.pink { background: linear-gradient(90deg, var(--pink-primary), var(--pink-dark)); }
+
+  /* ===== GANTT CHART (Project Schedule) ===== */
+  .gantt-container { overflow-x: auto; }
+  .gantt-table { min-width: 900px; }
+  .gantt-header { display: grid; grid-template-columns: 220px repeat(12, 1fr); border-bottom: 2px solid var(--grey-200); background: var(--grey-100); }
+  .gantt-header div { padding: 12px 8px; font-size: 11px; font-weight: 700; color: var(--grey-700); text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+  .gantt-header div:first-child { text-align: left; padding-left: 16px; }
+  .gantt-row { display: grid; grid-template-columns: 220px repeat(12, 1fr); border-bottom: 1px solid var(--grey-100); align-items: center; min-height: 56px; }
+  .gantt-row:hover { background: var(--grey-50); }
+  .gantt-task { padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--grey-800); display: flex; align-items: center; gap: 0.6rem; }
+  .gantt-bar-container { position: relative; grid-column: span 12; display: grid; grid-template-columns: repeat(12, 1fr); }
+  .gantt-phase { grid-column: var(--start) / span var(--duration); margin: 0 2px; height: 32px; border-radius: 8px; display: flex; align-items: center; padding: 0 10px; font-size: 11px; font-weight: 600; color: var(--white); }
+  .gantt-phase.pink { background: linear-gradient(90deg, var(--pink-primary), var(--pink-dark)); }
+  .gantt-phase.green { background: linear-gradient(90deg, #34d399, var(--green)); }
+  .gantt-phase.amber { background: linear-gradient(90deg, #fbbf24, var(--amber)); }
+  .gantt-phase.black { background: linear-gradient(90deg, var(--grey-700), var(--black)); }
+  .gantt-phase.dashed { background: transparent; border: 2px dashed var(--pink-primary); color: var(--pink-primary); }
+
+  /* ===== TIMELINE ===== */
+  .timeline-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; position: relative; }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 36px;
+    width: 2px;
+    height: calc(100% + 10px);
+    background: var(--grey-300);
+  }
+  .timeline-item:last-child::before { display: none; }
+  .timeline-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+    color: var(--white);
+    z-index: 1;
+  }
+  .timeline-dot.pink { background: var(--pink-primary); }
+  .timeline-dot.green { background: var(--green); }
+  .timeline-dot.amber { background: var(--amber); }
+  .timeline-dot.red { background: var(--red); }
+  .timeline-content { flex: 1; }
+  .timeline-content h5 { font-size: 14px; font-weight: 700; color: var(--black); margin-bottom: 0.25rem; }
+  .timeline-content p { font-size: 12px; color: var(--grey-600); line-height: 1.5; }
+  .timeline-date { font-size: 11px; color: var(--pink-primary); font-weight: 700; margin-bottom: 0.2rem; }
+
+  /* ===== RISK MATRIX ===== */
+  .risk-matrix {
+    display: grid;
+    grid-template-columns: 60px repeat(5, 1fr);
+    grid-template-rows: repeat(5, 50px) 30px;
+    gap: 4px;
+    margin-top: 1rem;
+  }
+  .matrix-cell {
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+    color: var(--white);
+  }
+  .matrix-label {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: var(--grey-600);
+    text-transform: uppercase;
+  }
+  .mc-green { background: rgba(16,185,129,0.75); }
+  .mc-amber { background: rgba(245,158,11,0.8); }
+  .mc-red { background: rgba(239,68,68,0.85); }
+  .mc-dark-red { background: rgba(153,27,27,0.95); }
+
+  /* ===== DONUT / PIE LEGEND ===== */
+  .legend-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--grey-100); font-size: 13px; }
+  .legend-item:last-child { border-bottom: none; }
+  .legend-left { display: flex; align-items: center; gap: 0.6rem; }
+  .legend-color { width: 12px; height: 12px; border-radius: 4px; }
+  .legend-value { font-weight: 800; color: var(--black); }
+
+  /* ===== ACTIVITY FEED ===== */
+  .activity-item { display: flex; gap: 1rem; padding: 12px 0; border-bottom: 1px solid var(--grey-100); }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+  .activity-avatar.p1 { background: linear-gradient(135deg, var(--pink-primary), var(--pink-dark)); }
+  .activity-avatar.p2 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+  .activity-avatar.p3 { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+  .activity-avatar.p4 { background: linear-gradient(135deg, var(--amber), #d97706); }
+  .activity-content { flex: 1; }
+  .activity-content p { font-size: 13px; color: var(--grey-700); line-height: 1.4; }
+  .activity-content p strong { color: var(--black); }
+  .activity-time { font-size: 11px; color: var(--grey-500); margin-top: 0.25rem; }
+
+  /* ===== QUICK STATS BAR ===== */
+  .quick-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .qs-item {
+    background: var(--grey-100);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    border-left: 4px solid var(--pink-primary);
+  }
+  .qs-label { font-size: 11px; color: var(--grey-600); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .qs-value { font-size: 22px; font-weight: 900; color: var(--black); margin-top: 0.3rem; }
+  .qs-sub { font-size: 11px; color: var(--grey-500); margin-top: 0.2rem; }
+
+  /* ===== CONTRACT MILESTONES ===== */
+  .milestone-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--grey-100); }
+  .milestone-item:last-child { border-bottom: none; }
+  .mile-left { display: flex; gap: 1rem; align-items: center; }
+  .mile-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .mile-info h5 { font-size: 14px; font-weight: 700; color: var(--black); }
+  .mile-info p { font-size: 12px; color: var(--grey-500); margin-top: 2px; }
+  .mile-status { text-align: right; }
+  .mile-status .date { font-size: 13px; font-weight: 700; color: var(--grey-800); }
+
+  /* ===== TAB BUTTONS ===== */
+  .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .tab-btn {
+    padding: 10px 18px;
+    background: var(--grey-100);
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--grey-700);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { background: var(--grey-200); }
+  .tab-btn.active { background: linear-gradient(135deg, var(--pink-primary), var(--pink-dark)); color: var(--white); box-shadow: 0 4px 12px rgba(236,72,153,0.3); }
+
+  @media (max-width: 900px) {
+    .login-container { grid-template-columns: 1fr; }
+    .login-brand { padding: 3rem 2rem; }
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .sidebar.open { transform: translateX(0); }
+    .main-content { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ====================================================== -->
+<!-- PAGE 1: LOGIN -->
+<!-- ====================================================== -->
+<div id="login-page" class="page active">
+  <div class="login-container">
+    <div class="login-brand">
+      <div class="brand-logo">
+        <div class="logo-icon">N</div>
+        <div class="brand-name">
+          <h1>NutriChain</h1>
+          <p>Project Consultant</p>
+        </div>
+      </div>
+      <div class="brand-tagline">
+        <h2>Transforming School Nutrition with <span>Data-Driven</span> Project Excellence</h2>
+        <p>A centralized digital platform for end-to-end tender lifecycle management, supplier performance monitoring, school delivery tracking, risk mitigation and stakeholder accountability for the KwaZulu-Natal NSNP.</p>
+      </div>
+      <div class="brand-features">
+        <div class="brand-feature"><div class="feature-check">&#10003;</div> Tender to Delivery Full Visibility</div>
+        <div class="brand-feature"><div class="feature-check">&#10003;</div> Real-Time Risk &amp; Issue Monitoring</div>
+        <div class="brand-feature"><div class="feature-check">&#10003;</div> Supplier &amp; Contract Performance Tracking</div>
+        <div class="brand-feature"><div class="feature-check">&#10003;</div> Proactive Executive Reporting</div>
+      </div>
+    </div>
+    <div class="login-form-section">
+      <div class="login-header">
+        <h2>Welcome Back</h2>
+        <p>Sign in to access the NutriChain dashboard suite</p>
+      </div>
+      <form onsubmit="event.preventDefault(); goToPage('executive');">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" class="form-input" value="admin@nutrichain.co.za" placeholder="you@organization.gov.za">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" class="form-input" value="********" placeholder="Enter your password">
+        </div>
+        <div class="form-row">
+          <label class="remember"><input type="checkbox" checked> Remember me</label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn-login">Sign In to Dashboard &rarr;</button>
+      </form>
+      <div class="screen-desc" style="margin-top:2rem; border-radius:12px;">
+        <h4>&#9432; SCREEN 1: Login Page</h4>
+        <p><strong>Purpose:</strong> Secure entry point to the NutriChain dashboard with role-based access control. Authenticates department officials, procurement staff, project managers, contract managers and school principals.</p>
+        <div class="meta-row">
+          <span class="meta-item"><strong>Users:</strong> All 8 stakeholder roles</span>
+          <span class="meta-item"><strong>Benefit:</strong> Ensures accountability, traceability &amp; data security</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- MAIN APP SHELL (pages 2-7 share this) -->
+<!-- ====================================================== -->
+<div class="page" id="app-shell">
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-inner">
+          <div class="sidebar-logo">N</div>
+          <div class="sidebar-brand-text">
+            <h3>NutriChain</h3>
+            <p>Project Consultant</p>
+          </div>
+        </div>
+      </div>
+      <nav class="nav-menu">
+        <div class="nav-section">Main</div>
+        <a class="nav-item active" data-page="executive" onclick="goToPage('executive')">
+          <span class="nav-icon">&#128202;</span> Executive Dashboard
+        </a>
+        <a class="nav-item" data-page="schedule" onclick="goToPage('schedule')">
+          <span class="nav-icon">&#128197;</span> Project Schedule
+        </a>
+        <a class="nav-item" data-page="tender" onclick="goToPage('tender')">
+          <span class="nav-icon">&#128221;</span> Tender Management
+        </a>
+        <div class="nav-section">Governance</div>
+        <a class="nav-item" data-page="risk" onclick="goToPage('risk')">
+          <span class="nav-icon">&#9888;&#65039;</span> Risk Management
+        </a>
+        <a class="nav-item" data-page="contract" onclick="goToPage('contract')">
+          <span class="nav-icon">&#128220;</span> Contract Management
+        </a>
+        <a class="nav-item" data-page="reporting" onclick="goToPage('reporting')">
+          <span class="nav-icon">&#128200;</span> Reporting Hub
+        </a>
+        <div class="nav-section">Session</div>
+        <a class="nav-item" onclick="goToPage('login')">
+          <span class="nav-icon">&#128682;</span> Sign Out
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-content">
+      <header class="topbar">
+        <div class="page-title">
+          <h2 id="page-header-title">Executive Dashboard</h2>
+          <p id="page-header-sub">KwaZulu-Natal National School Nutrition Programme (NSNP)</p>
+        </div>
+        <div class="topbar-actions">
+          <div class="search-box">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" placeholder="Search schools, suppliers, tenders...">
+          </div>
+          <div class="notification-bell" title="Alerts">&#128276;</div>
+          <div class="user-profile">
+            <div class="user-avatar">PN</div>
+            <div class="user-info">
+              <h4>Portia Ndlovu</h4>
+              <p>Programme Director</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ===== PAGE 2: EXECUTIVE DASHBOARD ===== -->
+      <main class="content-area" id="page-executive">
+        <div class="screen-desc">
+          <h4>&#9679; SCREEN 2: Executive Dashboard</h4>
+          <p><strong>Purpose:</strong> High-level, at-a-glance view of programme health with KPIs, traffic-light statuses and critical alerts. Enables senior management to make evidence-based decisions on resource allocation, escalations and corrective action.</p>
+          <div class="meta-row">
+            <span class="meta-item"><strong>Primary Users:</strong> Senior Management, HODs, Programme Directors</span>
+            <span class="meta-item"><strong>Also Used By:</strong> Project Managers, Donor Stakeholders</span>
+            <span class="meta-item"><strong>Benefit:</strong> Moves from reactive to proactive, data-driven organizational leadership</span>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Schools Receiving Food</div>
+              <div class="kpi-icon green">&#127979;</div>
+            </div>
+            <div class="kpi-value">5,842</div>
+            <div class="kpi-change up">&#9650; 124 this week</div>
+            <div class="kpi-sub">Target: 6,018 schools (97.1% coverage)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Learners Fed Daily</div>
+              <div class="kpi-icon pink">&#128104;&#8205;&#127859;</div>
+            </div>
+            <div class="kpi-value">2.14M</div>
+            <div class="kpi-change up">&#9650; 4.2% vs last month</div>
+            <div class="kpi-sub">Across uMgungundlovu, uThukela, iLembe districts</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Delivery Problems</div>
+              <div class="kpi-icon red">&#9888;&#65039;</div>
+            </div>
+            <div class="kpi-value">38</div>
+            <div class="kpi-change down">&#9660; 15 resolved</div>
+            <div class="kpi-sub">12 red · 18 amber · 8 monitored</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Active Suppliers</div>
+              <div class="kpi-icon amber">&#127974;</div>
+            </div>
+            <div class="kpi-value">47</div>
+            <div class="kpi-change up">&#9650; 3 new awards</div>
+            <div class="kpi-sub">4 green · 33 amber · 10 red-rated</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Open Risks</div>
+              <div class="kpi-icon red">&#128737;</div>
+            </div>
+            <div class="kpi-value">23</div>
+            <div class="kpi-change down">&#9660; 5 mitigated</div>
+            <div class="kpi-sub">4 high · 11 medium · 8 low</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Budget Utilisation</div>
+              <div class="kpi-icon pink">&#128176;</div>
+            </div>
+            <div class="kpi-value">72.4%</div>
+            <div class="kpi-change up">&#9650; On track</div>
+            <div class="kpi-sub">R 1.82B spent of R 2.51B annual budget</div>
+          </div>
+        </div>
+
+        <div class="grid-row cols-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Programme Performance Trend</div>
+              <button class="card-action">Last 6 months</button>
+            </div>
+            <div class="chart-container"><canvas id="execTrendChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">School Status Overview</div>
+              <button class="card-action">Details</button>
+            </div>
+            <div class="chart-container"><canvas id="execDonutChart"></canvas></div>
+            <div style="margin-top:0.5rem;">
+              <div class="legend-item"><div class="legend-left"><div class="legend-color" style="background:#10b981"></div> Fully On Track</div><span class="legend-value">71%</span></div>
+              <div class="legend-item"><div class="legend-left"><div class="legend-color" style="background:#f59e0b"></div> Minor Delays</div><span class="legend-value">21%</span></div>
+              <div class="legend-item"><div class="legend-left"><div class="legend-color" style="background:#ef4444"></div> Critical Issues</div><span class="legend-value">8%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-row cols-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Supplier Performance Ratings</div>
+              <button class="card-action primary">View All</button>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Supplier</th><th>District</th><th>On-Time</th><th>Quality</th><th>Rating</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Ingwe Foods (Pty) Ltd</strong></td><td>uMgungundlovu</td>
+                    <td><div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:96%"></div></div></td>
+                    <td><div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:94%"></div></div></td>
+                    <td><strong>4.8 / 5</strong></td><td><span class="badge green"><span class="status-dot green"></span> Excellent</span></td></tr>
+                  <tr><td><strong>Zululand Logistics CC</strong></td><td>uThukela</td>
+                    <td><div class="progress-bar-wrap"><div class="progress-bar-fill amber" style="width:78%"></div></div></td>
+                    <td><div class="progress-bar-wrap"><div class="progress-bar-fill amber" style="width:82%"></div></div></td>
+                    <td><strong>3.7 / 5</strong></td><td><span class="badge amber"><span class="status-dot amber"></span> Monitor</span></td></tr>
+                  <tr><td><strong>Midlands Dairy Distributors</strong></td><td>uMgungundlovu</td>
+                    <td><div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:91%"></div></div></td>
+                    <td><div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:89%"></div></div></td>
+                    <td><strong>4.4 / 5</strong></td><td><span class="badge green"><span class="status-dot green"></span> Good</span></td></tr>
+                  <tr><td><strong>Natal Grain Supply</strong></td><td>iLembe</td>
+                    <td><div class="progress-bar-wrap"><div class="progress-bar-fill red" style="width:54%"></div></div></td>
+                    <td><div class="progress-bar-wrap"><div class="progress-bar-fill amber" style="width:71%"></div></div></td>
+                    <td><strong>2.8 / 5</strong></td><td><span class="badge red"><span class="status-dot red"></span> Escalate</span></td></tr>
+                  <tr><td><strong>Ocean Harvest Products</strong></td><td>uThukela</td>
+                    <td><div class="progress-bar-wrap"><div class="progress-bar-fill amber" style="width:83%"></div></div></td>
+                    <td><div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:88%"></div></div></td>
+                    <td><strong>4.1 / 5</strong></td><td><span class="badge green"><span class="status-dot green"></span> Good</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Critical Alerts &amp; Activity</div>
+              <button class="card-action">Filter</button>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar p1">&#9888;</div>
+              <div class="activity-content">
+                <p><strong>RED ALERT:</strong> Natal Grain Supply missed 3 deliveries in iLembe North (Mondlo, KwaDukuza, Stanger) — 18,400 learners affected</p>
+                <div class="activity-time">Today · 07:42 · Escalated to Supply Chain Head</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar p4">&#128197;</div>
+              <div class="activity-content">
+                <p><strong>Tender T-23/047 Frozen Protein</strong> closes in <strong>3 days</strong> — 12 bidders registered</p>
+                <div class="activity-time">Today · 06:15 · SCM Reminder</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar p2">&#127979;</div>
+              <div class="activity-content">
+                <p><strong>LOVE HOWICK</strong> delivered emergency maize meal parcels to 21 uMngeni schools</p>
+                <div class="activity-time">Yesterday · 17:08 · NGO intervention</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar p3">&#128220;</div>
+              <div class="activity-content">
+                <p><strong>Contract #C-22/019 (Ingwe Foods)</strong> up for renewal — 60 day notice triggered</p>
+                <div class="activity-time">Yesterday · 14:30 · Contract Management</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar p1">&#9888;</div>
+              <div class="activity-content">
+                <p><strong>New HIGH RISK logged:</strong> Possible port strike in Durban may affect January protein consignment</p>
+                <div class="activity-time">2 days ago · Risk Register</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar p4">&#128176;</div>
+              <div class="activity-content">
+                <p><strong>Budget re-allocation approved:</strong> R 18.4M shifted to iLembe emergency feeding</p>
+                <div class="activity-time">3 days ago · Finance</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ===== PAGE 3: PROJECT SCHEDULE ===== -->
+      <main class="content-area" id="page-schedule" style="display:none;">
+        <div class="screen-desc">
+          <h4>&#9679; SCREEN 3: Project Schedule</h4>
+          <p><strong>Purpose:</strong> Integrated master schedule and Gantt view of the full NSNP project lifecycle — from tender advertising through procurement, award, contracting, supplier onboarding and live delivery operations. Tracks milestones, dependencies, owners and % completion against the 2025/26 academic calendar.</p>
+          <div class="meta-row">
+            <span class="meta-item"><strong>Primary Users:</strong> Project / Programme Managers, PMO Officers</span>
+            <span class="meta-item"><strong>Also Used By:</strong> SCM, Contract Managers, HODs (overview)</span>
+            <span class="meta-item"><strong>Benefit:</strong> Reduces delays, clarifies accountability, keeps cross-functional teams aligned on milestones</span>
+          </div>
+        </div>
+
+        <div class="quick-stats">
+          <div class="qs-item"><div class="qs-label">Total Milestones</div><div class="qs-value">48</div><div class="qs-sub">41 achieved · 4 in progress · 3 pending</div></div>
+          <div class="qs-item"><div class="qs-label">On-Time Delivery</div><div class="qs-value">85.4%</div><div class="qs-sub">vs 78% target (+7.4%)</div></div>
+          <div class="qs-item"><div class="qs-label">Upcoming (Next 30d)</div><div class="qs-value">7</div><div class="qs-sub">2 critical · 4 high · 1 medium</div></div>
+          <div class="qs-item"><div class="qs-label">Delayed Tasks</div><div class="qs-value">3</div><div class="qs-sub">2 amber · 1 red (being escalated)</div></div>
+        </div>
+
+        <div class="grid-row cols-2">
+          <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+              <div class="card-title">Master Gantt — NSNP 2025/26 Delivery Cycle</div>
+              <div class="tabs" style="margin:0;">
+                <button class="tab-btn active">Q3 Jan–Mar</button>
+                <button class="tab-btn">Q4 Apr–Jun</button>
+                <button class="tab-btn">Q1 Jul–Sep</button>
+                <button class="tab-btn">Q2 Oct–Dec</button>
+              </div>
+            </div>
+            <div class="gantt-container">
+              <div class="gantt-table">
+                <div class="gantt-header">
+                  <div>Task / Milestone</div><div>W1</div><div>W2</div><div>W3</div><div>W4</div><div>W5</div><div>W6</div><div>W7</div><div>W8</div><div>W9</div><div>W10</div><div>W11</div><div>W12</div>
+                </div>
+                <!-- Row 1 -->
+                <div class="gantt-row">
+                  <div class="gantt-task"><span style="color:var(--pink-primary);">&#9632;</span> 1.1 Tender: Fresh Produce Bulk</div>
+                  <div style="grid-column: span 12; display:grid; grid-template-columns:repeat(12,1fr); align-items:center;">
+                    <div class="gantt-phase pink" style="grid-column: 1 / span 3;">Advert (85%)</div>
+                  </div>
+                </div>
+                <!-- Row 2 -->
+                <div class="gantt-row">
+                  <div class="gantt-task"><span style="color:var(--green);">&#9632;</span> 1.2 Tender: Frozen Protein</div>
+                  <div style="grid-column: span 12; display:grid; grid-template-columns:repeat(12,1fr); align-items:center;">
+                    <div class="gantt-phase green" style="grid-column: 1 / span 5;">Evaluation (62%)</div>
+                  </div>
+                </div>
+                <!-- Row 3 -->
+                <div class="gantt-row">
+                  <div class="gantt-task"><span style="color:var(--amber);">&#9632;</span> 2.1 Bidder Clarifications</div>
+                  <div style="grid-column: span 12; display:grid; grid-template-columns:repeat(12,1fr); align-items:center;">
+                    <div class="gantt-phase amber" style="grid-column: 3 / span 2;">Done</div>
+                  </div>
+                </div>
+                <!-- Row 4 -->
+                <div class="gantt-row">
+                  <div class="gantt-task"><span style="color:var(--black);">&#9632;</span> 3.1 SCM Award Committee</div>
+                  <div style="grid-column: span 12; display:grid; grid-template-columns:repeat(12,1fr); align-items:center;">
+                    <div class="gantt-phase black" style="grid-column: 5 / span 1;">Feb 5</div>
+                  </div>
+                </div>
+                <!-- Row 5 -->
+                <div class="gantt-row">
+                  <div class="gantt-task"><span style="color:var(--pink-primary);">&#9632;</span> 3.2 Contract Negotiation (3 suppliers)</div>
+                  <div style="grid-column: span 12; display:grid; grid-template-columns:repeat(12,1fr); align-items:center;">
+                    <div class="gantt-phase dashed" style="grid-column: 6 / span 3;">Negotiate</div>
+                  </div>
+                </div>
+                <!-- Row 6 -->
+                <div class="gantt-row">
+                  <div class="gantt-task"><span style="color:var(--green);">&#9632;</span> 4.1 Supplier Onboarding &amp; Training</div>
+                  <div style="grid-column: span 12; display:grid; grid-template-columns:repeat(12,1fr); align-items:center;">
+                    <div class="gantt-phase dashed" style="grid-column: 8 / span 3;">Setup</div>
+                  </div>
+                </div>
+                <!-- Row 7 -->
+                <div class="gantt-row">
+                  <div class="gantt-task"><span style="color:var(--red);">&#9632;</span> 5.1 Pilot Live: iLembe</div>
+                  <div style="grid-column: span 12; display:grid; grid-template-columns:repeat(12,1fr); align-items:center;">
+                    <div class="gantt-phase dashed" style="grid-column: 11 / span 2; color:var(--red); border-color:var(--red);">Go-Live</div>
+                  </div>
+                </div>
+                <!-- Row 8 -->
+                <div class="gantt-row">
+                  <div class="gantt-task"><span style="color:var(--pink-primary);">&#9632;</span> 5.2 Full Rollout (All 5 Districts)</div>
+                  <div style="grid-column: span 12; display:grid; grid-template-columns:repeat(12,1fr); align-items:center;">
+                    <div class="gantt-phase dashed" style="grid-column: 12 / span 1;">&nbsp;</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-row cols-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Milestone Timeline</div>
+              <button class="card-action">View All</button>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot green">&#10003;</div>
+              <div class="timeline-content">
+                <div class="timeline-date">Completed · 12 January 2026</div>
+                <h5>Advert Publish: T-22/072 Staple Foods (R 412M)</h5>
+                <p>26 expressions of interest received, compulsory briefing held on 18 Jan with 21 attendees.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot green">&#10003;</div>
+              <div class="timeline-content">
+                <div class="timeline-date">Completed · 22 January 2026</div>
+                <h5>Bid Closing: T-22/068 Maize &amp; Soya</h5>
+                <p>17 valid bids received; evaluations in progress by Bid Evaluation Committee (BEC).</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot pink">&#9881;</div>
+              <div class="timeline-content">
+                <div class="timeline-date">In Progress · Due 04 February 2026</div>
+                <h5>Award Recommendation: Frozen Protein (T-23/047)</h5>
+                <p>Shortlist of 5 bidders approved. Oral presentations scheduled for 29 &amp; 30 Jan.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot amber">&#33;</div>
+              <div class="timeline-content">
+                <div class="timeline-date">Upcoming · 11 February 2026</div>
+                <h5>Mini-Bid Opening: Small-Scale Bakeries (SMME)</h5>
+                <p>Target: 40% SMME subcontracting compliance. Geared to women- &amp; youth-owned enterprises.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot red">&#9888;</div>
+              <div class="timeline-content">
+                <div class="timeline-date">At Risk · Due 18 February 2026</div>
+                <h5>Contract Signing: Midlands Dairy (Renewal)</h5>
+                <p>Delay in SLA re-negotiation on delivery KPIs. May require conditional 30-day extension.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Task Breakdown by Stream</div>
+            </div>
+            <div class="chart-container"><canvas id="scheduleBarChart"></canvas></div>
+            <div style="margin-top:1.2rem;">
+              <div class="milestone-item">
+                <div class="mile-left">
+                  <div class="mile-icon" style="background:var(--pink-light); color:var(--pink-primary);">&#128221;</div>
+                  <div class="mile-info"><h5>Procurement Stream</h5><p>8 tasks · 3 owners</p></div>
+                </div>
+                <div class="mile-status">
+                  <div class="progress-bar-wrap" style="width:110px;"><div class="progress-bar-fill pink" style="width:64%"></div></div>
+                  <div class="date" style="font-size:11px; margin-top:0.3rem;">64% complete</div>
+                </div>
+              </div>
+              <div class="milestone-item">
+                <div class="mile-left">
+                  <div class="mile-icon" style="background:#d1fae5; color:var(--green);">&#127974;</div>
+                  <div class="mile-info"><h5>Supplier Onboarding</h5><p>6 tasks · 2 owners</p></div>
+                </div>
+                <div class="mile-status">
+                  <div class="progress-bar-wrap" style="width:110px;"><div class="progress-bar-fill green" style="width:42%"></div></div>
+                  <div class="date" style="font-size:11px; margin-top:0.3rem;">42% complete</div>
+                </div>
+              </div>
+              <div class="milestone-item">
+                <div class="mile-left">
+                  <div class="mile-icon" style="background:#fef3c7; color:var(--amber);">&#128666;</div>
+                  <div class="mile-info"><h5>Logistics &amp; Delivery</h5><p>11 tasks · 4 owners</p></div>
+                </div>
+                <div class="mile-status">
+                  <div class="progress-bar-wrap" style="width:110px;"><div class="progress-bar-fill amber" style="width:78%"></div></div>
+                  <div class="date" style="font-size:11px; margin-top:0.3rem;">78% complete</div>
+                </div>
+              </div>
+              <div class="milestone-item">
+                <div class="mile-left">
+                  <div class="mile-icon" style="background:#fee2e2; color:var(--red);">&#128737;</div>
+                  <div class="mile-info"><h5>Risk &amp; Compliance</h5><p>7 tasks · 2 owners</p></div>
+                </div>
+                <div class="mile-status">
+                  <div class="progress-bar-wrap" style="width:110px;"><div class="progress-bar-fill red" style="width:55%"></div></div>
+                  <div class="date" style="font-size:11px; margin-top:0.3rem;">55% complete</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ===== PAGE 4: TENDER MANAGEMENT ===== -->
+      <main class="content-area" id="page-tender" style="display:none;">
+        <div class="screen-desc">
+          <h4>&#9679; SCREEN 4: Tender Management Dashboard</h4>
+          <p><strong>Purpose:</strong> End-to-end procurement funnel tracking from opportunity identification, advert publishing, bid submissions, evaluation committees, award recommendations and final supplier appointment. Transparency across the complete tender lifecycle enables fair, compliant and accelerated procurement outcomes.</p>
+          <div class="meta-row">
+            <span class="meta-item"><strong>Primary Users:</strong> SCM / Tender Officials, Bid Committees, CFO Office</span>
+            <span class="meta-item"><strong>Also Used By:</strong> Programme Managers, Auditor-General (audit trail)</span>
+            <span class="meta-item"><strong>Benefit:</strong> Eliminates procurement delays, ensures compliance with PFMA &amp; SCM regulations, increases fairness &amp; transparency</span>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Active Tenders</div>
+              <div class="kpi-icon pink">&#128221;</div>
+            </div>
+            <div class="kpi-value">18</div>
+            <div class="kpi-change up">&#9650; 3 new this week</div>
+            <div class="kpi-sub">Combined value: R 1.34B</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Closing This Week</div>
+              <div class="kpi-icon amber">&#128197;</div>
+            </div>
+            <div class="kpi-value">5</div>
+            <div class="kpi-change down">&#128336; Avg 4.2 days left</div>
+            <div class="kpi-sub">2 high-value (> R 100M)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">In Evaluation</div>
+              <div class="kpi-icon pink">&#9881;</div>
+            </div>
+            <div class="kpi-value">9</div>
+            <div class="kpi-change up">Avg 68% complete</div>
+            <div class="kpi-sub">3 at BEC, 4 at AEC, 2 at SCM</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Supplier Bids Received</div>
+              <div class="kpi-icon green">&#127974;</div>
+            </div>
+            <div class="kpi-value">217</div>
+            <div class="kpi-change up">&#9650; 32 this week</div>
+            <div class="kpi-sub">38% SMME · 22% women-owned</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Awards This Quarter</div>
+              <div class="kpi-icon green">&#127942;</div>
+            </div>
+            <div class="kpi-value">12</div>
+            <div class="kpi-change up">&#9650; On target</div>
+            <div class="kpi-sub">R 618M total value awarded</div>
+          </div>
+        </div>
+
+        <div class="grid-row cols-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Procurement Funnel</div>
+              <button class="card-action">2025/26 YTD</button>
+            </div>
+            <div class="chart-container"><canvas id="tenderFunnelChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Tender Categories (Value)</div>
+              <button class="card-action">Breakdown</button>
+            </div>
+            <div class="chart-container"><canvas id="tenderCategoryChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Active Tender Register</div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="card-action">Export</button>
+              <button class="card-action primary">+ New Tender</button>
+            </div>
+          </div>
+          <div class="tabs">
+            <button class="tab-btn active">All (18)</button>
+            <button class="tab-btn">Draft (2)</button>
+            <button class="tab-btn">Published (5)</button>
+            <button class="tab-btn">Evaluation (9)</button>
+            <button class="tab-btn">Awarded (2)</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tender Ref</th><th>Title</th><th>Category</th><th>Value (R)</th>
+                  <th>Stage</th><th>Bidders</th><th>Deadline</th><th>Owner</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>T-23/047</strong></td>
+                  <td>Frozen Protein Bulk Supply (24 months)</td>
+                  <td>Protein</td>
+                  <td><strong>312,400,000</strong></td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill amber" style="width:72%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">BEC Evaluation</div></td>
+                  <td>23</td>
+                  <td>04 Feb 2026</td>
+                  <td>S. Chetty</td>
+                  <td><span class="badge amber"><span class="status-dot amber"></span> On Track</span></td>
+                </tr>
+                <tr>
+                  <td><strong>T-22/072</strong></td>
+                  <td>Fresh Produce (Fruit &amp; Vegetables)</td>
+                  <td>Fresh</td>
+                  <td><strong>412,000,000</strong></td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill pink" style="width:28%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">Bid Window Open</div></td>
+                  <td>26</td>
+                  <td>13 Feb 2026</td>
+                  <td>N. Mkhize</td>
+                  <td><span class="badge pink"><span class="status-dot" style="background:var(--pink-primary);"></span> Accepting Bids</span></td>
+                </tr>
+                <tr>
+                  <td><strong>T-22/068</strong></td>
+                  <td>Maize Meal &amp; Soya Products</td>
+                  <td>Staples</td>
+                  <td><strong>278,900,000</strong></td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill amber" style="width:55%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">Evaluation</div></td>
+                  <td>17</td>
+                  <td>Closed</td>
+                  <td>T. Naidoo</td>
+                  <td><span class="badge amber"><span class="status-dot amber"></span> On Track</span></td>
+                </tr>
+                <tr>
+                  <td><strong>T-23/051</strong></td>
+                  <td>Bread &amp; Bakery (SMME Quota)</td>
+                  <td>Bakery</td>
+                  <td><strong>84,500,000</strong></td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill pink" style="width:15%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">Pre-Advert</div></td>
+                  <td>—</td>
+                  <td>27 Feb 2026</td>
+                  <td>L. Dlamini</td>
+                  <td><span class="badge grey">Draft</span></td>
+                </tr>
+                <tr>
+                  <td><strong>T-22/059</strong></td>
+                  <td>Long-Life Dairy (Milk, Yoghurt)</td>
+                  <td>Dairy</td>
+                  <td><strong>146,200,000</strong></td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill red" style="width:92%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">Award Delayed</div></td>
+                  <td>11</td>
+                  <td>18 Jan 2026</td>
+                  <td>S. Chetty</td>
+                  <td><span class="badge red"><span class="status-dot red"></span> Delayed</span></td>
+                </tr>
+                <tr>
+                  <td><strong>T-23/044</strong></td>
+                  <td>Cold Chain Logistics &amp; Warehousing</td>
+                  <td>Logistics</td>
+                  <td><strong>98,750,000</strong></td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:100%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">Awarded</div></td>
+                  <td>14</td>
+                  <td>Closed</td>
+                  <td>P. Zulu</td>
+                  <td><span class="badge green"><span class="status-dot green"></span> Awarded</span></td>
+                </tr>
+                <tr>
+                  <td><strong>T-23/039</strong></td>
+                  <td>School Cutlery &amp; Kitchen Equipment</td>
+                  <td>Equipment</td>
+                  <td><strong>34,100,000</strong></td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:100%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">Awarded</div></td>
+                  <td>9</td>
+                  <td>Closed</td>
+                  <td>N. Mkhize</td>
+                  <td><span class="badge green"><span class="status-dot green"></span> Awarded</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      <!-- ===== PAGE 5: RISK MANAGEMENT ===== -->
+      <main class="content-area" id="page-risk" style="display:none;">
+        <div class="screen-desc">
+          <h4>&#9679; SCREEN 5: Risk Management Dashboard</h4>
+          <p><strong>Purpose:</strong> Centralised risk register with impact vs likelihood heat-map, traffic-light ratings (Green/Amber/Red), accountable owners and mitigation plans. Ensures risks are identified early, assigned, tracked and escalated before they disrupt learner feeding or financial performance.</p>
+          <div class="meta-row">
+            <span class="meta-item"><strong>Primary Users:</strong> Risk Officers, Project / Programme Managers</span>
+            <span class="meta-item"><strong>Also Used By:</strong> HODs, Audit &amp; Assurance, EXCO (for red risks)</span>
+            <span class="meta-item"><strong>Benefit:</strong> Reduces probability of service disruption; enables evidence-based contingency budgeting</span>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Total Open Risks</div><div class="kpi-icon pink">&#128737;</div></div>
+            <div class="kpi-value">23</div>
+            <div class="kpi-change down">&#9660; 5 closed / mitigated</div>
+            <div class="kpi-sub">3 new risks logged this week</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">High / Critical</div><div class="kpi-icon red">&#128308;</div></div>
+            <div class="kpi-value">4</div>
+            <div class="kpi-change up">1 escalated to EXCO</div>
+            <div class="kpi-sub">Requires weekly mitigation review</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Medium / Amber</div><div class="kpi-icon amber">&#128992;</div></div>
+            <div class="kpi-value">11</div>
+            <div class="kpi-change down">2 downgraded</div>
+            <div class="kpi-sub">Owned by stream leads</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Low / Green</div><div class="kpi-icon green">&#128994;</div></div>
+            <div class="kpi-value">8</div>
+            <div class="kpi-change up">3 new</div>
+            <div class="kpi-sub">Monitored monthly</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Contingency Reserve</div><div class="kpi-icon pink">&#128176;</div></div>
+            <div class="kpi-value">R 84.2M</div>
+            <div class="kpi-change up">3.35% of budget</div>
+            <div class="kpi-sub">R 12.6M provisioned against red risks</div>
+          </div>
+        </div>
+
+        <div class="grid-row cols-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Risk Matrix (Impact × Likelihood)</div>
+              <button class="card-action">Legend</button>
+            </div>
+            <div style="font-size:12px; color:var(--grey-600); margin-bottom:0.3rem;">Click cells to see risks · Hover over for counts</div>
+            <div class="risk-matrix">
+              <!-- top empty + likelihood labels -->
+              <div></div>
+              <div class="matrix-label">Very Low</div>
+              <div class="matrix-label">Low</div>
+              <div class="matrix-label">Medium</div>
+              <div class="matrix-label">High</div>
+              <div class="matrix-label">Very High</div>
+
+              <div class="matrix-label" style="writing-mode: vertical-rl; transform: rotate(180deg); height: calc(5*54px); align-self: start; grid-row: span 5;">IMPACT &#9650;</div>
+              <!-- Row 1 Very High Impact -->
+              <div class="matrix-cell mc-amber" title="2 risks">2</div>
+              <div class="matrix-cell mc-amber" title="3 risks">3</div>
+              <div class="matrix-cell mc-red" title="2 risks">2</div>
+              <div class="matrix-cell mc-dark-red" title="2 risks">2</div>
+              <div class="matrix-cell mc-dark-red" title="1 risks">1</div>
+              <!-- Row 2 High Impact -->
+              <div class="matrix-cell mc-green" title="1">1</div>
+              <div class="matrix-cell mc-amber" title="2">2</div>
+              <div class="matrix-cell mc-amber" title="2">2</div>
+              <div class="matrix-cell mc-red" title="1">1</div>
+              <div class="matrix-cell mc-red" title="1">1</div>
+              <!-- Row 3 Medium Impact -->
+              <div class="matrix-cell mc-green" title="1">1</div>
+              <div class="matrix-cell mc-green" title="1">1</div>
+              <div class="matrix-cell mc-amber" title="2">2</div>
+              <div class="matrix-cell mc-amber" title="1">1</div>
+              <div class="matrix-cell mc-red" title="0">—</div>
+              <!-- Row 4 Low Impact -->
+              <div class="matrix-cell mc-green" title="2">2</div>
+              <div class="matrix-cell mc-green" title="1">1</div>
+              <div class="matrix-cell mc-green" title="0">—</div>
+              <div class="matrix-cell mc-amber" title="0">—</div>
+              <div class="matrix-cell mc-amber" title="0">—</div>
+              <!-- Row 5 Very Low -->
+              <div class="matrix-cell mc-green" title="1">1</div>
+              <div class="matrix-cell mc-green" title="0">—</div>
+              <div class="matrix-cell mc-green" title="0">—</div>
+              <div class="matrix-cell mc-green" title="0">—</div>
+              <div class="matrix-cell mc-amber" title="0">—</div>
+
+              <!-- bottom labels -->
+              <div></div>
+              <div class="matrix-label" colspan="5" style="grid-column: 1 / -1; text-align:center; padding-top:0.8rem;">LIKELIHOOD &#9654;</div>
+            </div>
+            <div style="display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap; font-size:12px;">
+              <div class="legend-item" style="border-bottom:none; padding:0;"><div class="legend-left"><div class="legend-color mc-green"></div> Green (Low)</div></div>
+              <div class="legend-item" style="border-bottom:none; padding:0;"><div class="legend-left"><div class="legend-color mc-amber"></div> Amber (Medium)</div></div>
+              <div class="legend-item" style="border-bottom:none; padding:0;"><div class="legend-left"><div class="legend-color mc-red"></div> Red (High)</div></div>
+              <div class="legend-item" style="border-bottom:none; padding:0;"><div class="legend-left"><div class="legend-color mc-dark-red"></div> Dark Red (Critical)</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Risk Trend by Severity</div>
+              <button class="card-action">Last 8 weeks</button>
+            </div>
+            <div class="chart-container"><canvas id="riskTrendChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Live Risk Register</div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="card-action">Filters</button>
+              <button class="card-action primary">+ Log Risk</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>Risk Description</th><th>Category</th><th>Owner</th>
+                  <th>Likelihood</th><th>Impact</th><th>Risk Score</th><th>Mitigation Plan</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>R-023</strong></td>
+                  <td>Potential port strike in Durban delays January/February protein consignment (± R 120M)</td>
+                  <td>Supply Chain</td>
+                  <td>D. Naicker</td>
+                  <td><span class="badge amber">High</span></td>
+                  <td><span class="badge red">Very High</span></td>
+                  <td><span class="badge red">20 / 25</span></td>
+                  <td style="font-size:12px;">Divert 35% volume to Cape Town port; pre-order 2 weeks buffer stock.</td>
+                  <td><span class="badge red"><span class="status-dot red"></span> Critical</span></td>
+                </tr>
+                <tr>
+                  <td><strong>R-021</strong></td>
+                  <td>Contract #C-22/019 Midlands Dairy renewal delayed — coverage gap likely 18 Feb</td>
+                  <td>Contract</td>
+                  <td>L. Dlamini</td>
+                  <td><span class="badge red">Very High</span></td>
+                  <td><span class="badge red">High</span></td>
+                  <td><span class="badge red">20 / 25</span></td>
+                  <td style="font-size:12px;">Issue conditional 30-day extension; parallel back-up supplier pre-qualification.</td>
+                  <td><span class="badge red"><span class="status-dot red"></span> Critical</span></td>
+                </tr>
+                <tr>
+                  <td><strong>R-018</strong></td>
+                  <td>Natal Grain Supply performance — 3 consecutive missed deliveries, 54% on-time rating</td>
+                  <td>Supplier</td>
+                  <td>S. Chetty</td>
+                  <td><span class="badge red">Very High</span></td>
+                  <td><span class="badge amber">Medium</span></td>
+                  <td><span class="badge amber">16 / 25</span></td>
+                  <td style="font-size:12px;">Formal notice; 14-day performance improvement plan; activate secondary roster.</td>
+                  <td><span class="badge amber"><span class="status-dot amber"></span> Monitor</span></td>
+                </tr>
+                <tr>
+                  <td><strong>R-015</strong></td>
+                  <td>Protest / community unrest disrupts access routes in northern iLembe schools</td>
+                  <td>Operations</td>
+                  <td>P. Zulu</td>
+                  <td><span class="badge amber">Medium</span></td>
+                  <td><span class="badge red">High</span></td>
+                  <td><span class="badge amber">15 / 25</span></td>
+                  <td style="font-size:12px;">Joint security route planning with SAPS &amp; Metro Police; community liaison.</td>
+                  <td><span class="badge amber"><span class="status-dot amber"></span> Monitor</span></td>
+                </tr>
+                <tr>
+                  <td><strong>R-011</strong></td>
+                  <td>Exchange rate fluctuation affects imported food commodities pricing</td>
+                  <td>Financial</td>
+                  <td>T. Naidoo</td>
+                  <td><span class="badge amber">Medium</span></td>
+                  <td><span class="badge amber">Medium</span></td>
+                  <td><span class="badge amber">12 / 25</span></td>
+                  <td style="font-size:12px;">6-month forward cover on ZAR/USD; index-clause in supplier contracts.</td>
+                  <td><span class="badge amber"><span class="status-dot amber"></span> Monitor</span></td>
+                </tr>
+                <tr>
+                  <td><strong>R-007</strong></td>
+                  <td>System downtime / connectivity outage at district offices disrupts daily reporting</td>
+                  <td>ICT</td>
+                  <td>M. Singh</td>
+                  <td><span class="badge amber">Medium</span></td>
+                  <td><span class="badge green">Low</span></td>
+                  <td><span class="badge green">8 / 25</span></td>
+                  <td style="font-size:12px;">Offline mobile capture app; redundant 4G routers at district offices.</td>
+                  <td><span class="badge green"><span class="status-dot green"></span> Acceptable</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      <!-- ===== PAGE 6: CONTRACT MANAGEMENT ===== -->
+      <main class="content-area" id="page-contract" style="display:none;">
+        <div class="screen-desc">
+          <h4>&#9679; SCREEN 6: Contract Management Dashboard</h4>
+          <p><strong>Purpose:</strong> Central repository for all NSNP service contracts. Manages obligations, deliverables, milestones, SLAs, expiry dates, variations and renewal workflows. Reduces contract leakage by linking every signed obligation back to actual supplier delivery performance.</p>
+          <div class="meta-row">
+            <span class="meta-item"><strong>Primary Users:</strong> Contract Managers, Legal Services, SCM</span>
+            <span class="meta-item"><strong>Also Used By:</strong> Finance (payments), Programme Managers (SLAs)</span>
+            <span class="meta-item"><strong>Benefit:</strong> Ensures payments are only made for verified performance; reduces penalties, disputes and litigation</span>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Active Contracts</div><div class="kpi-icon pink">&#128220;</div></div>
+            <div class="kpi-value">47</div>
+            <div class="kpi-change up">+3 awarded</div>
+            <div class="kpi-sub">Total value: R 2.14B</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Expiring in 90 Days</div><div class="kpi-icon amber">&#8987;</div></div>
+            <div class="kpi-value">8</div>
+            <div class="kpi-change up">5 in renewal</div>
+            <div class="kpi-sub">Value: R 412M (renewal pipeline)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">SLA Compliance</div><div class="kpi-icon green">&#10004;</div></div>
+            <div class="kpi-value">86.2%</div>
+            <div class="kpi-change up">+3.4% QoQ</div>
+            <div class="kpi-sub">Target: ≥ 85% (achieved)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Active Variations</div><div class="kpi-icon pink">&#9881;</div></div>
+            <div class="kpi-value">6</div>
+            <div class="kpi-change">2 pending approval</div>
+            <div class="kpi-sub">Net value change: + R 18.6M</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Penalties Raised</div><div class="kpi-icon red">&#9888;</div></div>
+            <div class="kpi-value">R 2.84M</div>
+            <div class="kpi-change down">- R 0.9M this month</div>
+            <div class="kpi-sub">11 suppliers · 6 settled, 5 disputed</div>
+          </div>
+        </div>
+
+        <div class="grid-row cols-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Contract Value by Type</div>
+              <button class="card-action">Details</button>
+            </div>
+            <div class="chart-container"><canvas id="contractTypeChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Renewal Calendar (Next 180 days)</div>
+              <button class="card-action">Export</button>
+            </div>
+            <div style="margin-top:0.3rem;">
+              <div class="milestone-item">
+                <div class="mile-left">
+                  <div class="mile-icon" style="background:#fee2e2; color:var(--red);">30d</div>
+                  <div class="mile-info"><h5>#C-22/019 Midlands Dairy</h5><p>Dairy · R 86.4M · uMgungundlovu</p></div>
+                </div>
+                <div class="mile-status"><div class="date">18 Feb 2026</div><span class="badge red"><span class="status-dot red"></span> At Risk</span></div>
+              </div>
+              <div class="milestone-item">
+                <div class="mile-left">
+                  <div class="mile-icon" style="background:#fee2e2; color:var(--red);">41d</div>
+                  <div class="mile-info"><h5>#C-22/022 Zululand Logistics</h5><p>Logistics · R 48.1M · uThukela</p></div>
+                </div>
+                <div class="mile-status"><div class="date">01 Mar 2026</div><span class="badge amber"><span class="status-dot amber"></span> Review</span></div>
+              </div>
+              <div class="milestone-item">
+                <div class="mile-left">
+                  <div class="mile-icon" style="background:#fef3c7; color:var(--amber);">58d</div>
+                  <div class="mile-info"><h5>#C-22/025 Ocean Harvest Products</h5><p>Protein · R 62.7M · uThukela</p></div>
+                </div>
+                <div class="mile-status"><div class="date">18 Mar 2026</div><span class="badge amber"><span class="status-dot amber"></span> Review</span></div>
+              </div>
+              <div class="milestone-item">
+                <div class="mile-left">
+                  <div class="mile-icon" style="background:#fef3c7; color:var(--amber);">74d</div>
+                  <div class="mile-info"><h5>#C-23/003 SMME Bakery Collective</h5><p>Bakery · R 31.8M · iLembe</p></div>
+                </div>
+                <div class="mile-status"><div class="date">03 Apr 2026</div><span class="badge amber"><span class="status-dot amber"></span> Review</span></div>
+              </div>
+              <div class="milestone-item">
+                <div class="mile-left">
+                  <div class="mile-icon" style="background:var(--pink-light); color:var(--pink-primary);">102d</div>
+                  <div class="mile-info"><h5>#C-23/007 Cold Chain Logistics</h5><p>Logistics · R 98.7M · All Districts</p></div>
+                </div>
+                <div class="mile-status"><div class="date">01 May 2026</div><span class="badge green"><span class="status-dot green"></span> On Track</span></div>
+              </div>
+              <div class="milestone-item">
+                <div class="mile-left">
+                  <div class="mile-icon" style="background:var(--pink-light); color:var(--pink-primary);">141d</div>
+                  <div class="mile-info"><h5>#C-23/011 Natal Grain Supply</h5><p>Staples · R 78.2M · iLembe</p></div>
+                </div>
+                <div class="mile-status"><div class="date">09 Jun 2026</div><span class="badge red"><span class="status-dot red"></span> Dispute</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Contract Register — Obligations, SLAs &amp; Deliverables</div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="card-action">Filter</button>
+              <button class="card-action primary">+ Variation</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Contract #</th><th>Supplier</th><th>Scope</th><th>Value (R)</th><th>Term</th>
+                  <th>Milestones</th><th>SLA %</th><th>Deliverables</th><th>Expiry</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>C-22/019</strong></td>
+                  <td>Midlands Dairy Distributors</td>
+                  <td>Long-life milk &amp; yoghurt</td>
+                  <td>86,400,000</td>
+                  <td>24 months</td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill pink" style="width:88%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">22/25 complete</div></td>
+                  <td><strong style="color:var(--green);">92%</strong></td>
+                  <td><div style="font-size:12px;">Mon/Wed/Fri drops · 5,200 L/day</div></td>
+                  <td>18 Feb 2026</td>
+                  <td><span class="badge red"><span class="status-dot red"></span> Renewal</span></td>
+                </tr>
+                <tr>
+                  <td><strong>C-23/007</strong></td>
+                  <td>Ingwe Foods (Pty) Ltd</td>
+                  <td>Staple foods (maize, soya)</td>
+                  <td>278,900,000</td>
+                  <td>36 months</td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:71%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">32/45 complete</div></td>
+                  <td><strong style="color:var(--green);">96%</strong></td>
+                  <td><div style="font-size:12px;">Weekly · 320 tons/week</div></td>
+                  <td>14 Nov 2027</td>
+                  <td><span class="badge green"><span class="status-dot green"></span> Active</span></td>
+                </tr>
+                <tr>
+                  <td><strong>C-23/011</strong></td>
+                  <td>Natal Grain Supply</td>
+                  <td>Bulk grain &amp; cereals</td>
+                  <td>78,200,000</td>
+                  <td>18 months</td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill red" style="width:48%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">9/19 complete</div></td>
+                  <td><strong style="color:var(--red);">54%</strong></td>
+                  <td><div style="font-size:12px;">Bi-weekly · 180 tons/fortnight</div></td>
+                  <td>09 Jun 2026</td>
+                  <td><span class="badge red"><span class="status-dot red"></span> Performance</span></td>
+                </tr>
+                <tr>
+                  <td><strong>C-23/003</strong></td>
+                  <td>SMME Bakery Collective</td>
+                  <td>Fresh bread (rolls &amp; loaves)</td>
+                  <td>31,800,000</td>
+                  <td>12 months</td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill amber" style="width:62%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">11/18 complete</div></td>
+                  <td><strong style="color:var(--amber);">79%</strong></td>
+                  <td><div style="font-size:12px;">Daily · 42,000 units</div></td>
+                  <td>03 Apr 2026</td>
+                  <td><span class="badge amber"><span class="status-dot amber"></span> Monitor</span></td>
+                </tr>
+                <tr>
+                  <td><strong>C-22/025</strong></td>
+                  <td>Ocean Harvest Products</td>
+                  <td>Frozen fish &amp; protein</td>
+                  <td>62,700,000</td>
+                  <td>24 months</td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:79%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">19/24 complete</div></td>
+                  <td><strong style="color:var(--green);">88%</strong></td>
+                  <td><div style="font-size:12px;">Weekly · 40 tons/week</div></td>
+                  <td>18 Mar 2026</td>
+                  <td><span class="badge amber"><span class="status-dot amber"></span> Renewal</span></td>
+                </tr>
+                <tr>
+                  <td><strong>C-23/008</strong></td>
+                  <td>Zululand Logistics CC</td>
+                  <td>Last-mile delivery services</td>
+                  <td>48,100,000</td>
+                  <td>18 months</td>
+                  <td><div class="progress-bar-wrap"><div class="progress-bar-fill amber" style="width:56%"></div></div><div style="font-size:11px; color:var(--grey-600); margin-top:3px;">10/18 complete</div></td>
+                  <td><strong style="color:var(--amber);">78%</strong></td>
+                  <td><div style="font-size:12px;">Daily · 14 routes</div></td>
+                  <td>01 Mar 2026</td>
+                  <td><span class="badge amber"><span class="status-dot amber"></span> Monitor</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      <!-- ===== PAGE 7: REPORTING HUB (Overall) ===== -->
+      <main class="content-area" id="page-reporting" style="display:none;">
+        <div class="screen-desc">
+          <h4>&#9679; SCREEN 7: Overall Reporting Dashboard</h4>
+          <p><strong>Purpose:</strong> Consolidated reporting hub that brings together programme performance, tender outcomes, supplier delivery, risk exposure, contract health and emergency intervention data into a single, authoritative reporting layer. Produces EXCO packs, district reports, NGO stakeholder updates and AG-ready audit evidence with a single click.</p>
+          <div class="meta-row">
+            <span class="meta-item"><strong>Primary Users:</strong> Programme Directors, EXCO, PMO, Auditor-General</span>
+            <span class="meta-item"><strong>Also Used By:</strong> National DBE, Treasury, Municipalities, Donors &amp; NGO Partners</span>
+            <span class="meta-item"><strong>Benefit:</strong> Single source of the truth — faster, auditable, evidence-based reporting across every stakeholder tier</span>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Programme Health Score</div><div class="kpi-icon green">&#127919;</div></div>
+            <div class="kpi-value">82.6<small style="font-size:16px;">/100</small></div>
+            <div class="kpi-change up">&#9650; +4.1 MoM</div>
+            <div class="kpi-sub">Composite: delivery · financial · risk · SLA</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Cumulative Learner Meals</div><div class="kpi-icon pink">&#127860;</div></div>
+            <div class="kpi-value">384.2M</div>
+            <div class="kpi-change up">&#9650; +12.7M this month</div>
+            <div class="kpi-sub">YTD April 2025 → January 2026</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Emergency Interventions</div><div class="kpi-icon amber">&#128657;</div></div>
+            <div class="kpi-value">147</div>
+            <div class="kpi-change up">28 active</div>
+            <div class="kpi-sub">NGO &amp; Municipal partners: 62,400 parcels</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Stakeholder Engagements</div><div class="kpi-icon pink">&#129309;</div></div>
+            <div class="kpi-value">684</div>
+            <div class="kpi-change up">+92 this month</div>
+            <div class="kpi-sub">Schools 312 · Suppliers 148 · Municipal 94</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Audit Compliance</div><div class="kpi-icon green">&#128203;</div></div>
+            <div class="kpi-value">94.8%</div>
+            <div class="kpi-change up">+2.6% vs AG 2024</div>
+            <div class="kpi-sub">3 minor findings · 0 material</div>
+          </div>
+        </div>
+
+        <div class="grid-row cols-3">
+          <div class="card">
+            <div class="card-header"><div class="card-title">District Performance</div></div>
+            <div class="chart-container"><canvas id="districtRadarChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Budget vs Actual</div><button class="card-action">Full Year</button></div>
+            <div class="chart-container"><canvas id="budgetChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Beneficiary Reach by Quintile</div></div>
+            <div class="chart-container"><canvas id="quintileChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="grid-row cols-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Standard Report Library</div>
+              <button class="card-action primary">+ Custom Report</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+              <div style="padding:14px; border:2px solid var(--grey-200); border-radius:12px; cursor:pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--pink-primary)'" onmouseout="this.style.borderColor='var(--grey-200)'">
+                <div style="font-size:22px; margin-bottom:0.4rem;">&#128202;</div>
+                <h5 style="font-size:14px; font-weight:800; color:var(--black);">Monthly EXCO Pack</h5>
+                <p style="font-size:12px; color:var(--grey-600); margin-top:0.3rem;">Full board pack: KPIs, risks, finance</p>
+                <div style="margin-top:0.6rem; display:flex; gap:0.4rem;"><span class="badge pink">Last: 15 Jan</span><span class="badge grey">PDF · PPTX</span></div>
+              </div>
+              <div style="padding:14px; border:2px solid var(--grey-200); border-radius:12px; cursor:pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--pink-primary)'" onmouseout="this.style.borderColor='var(--grey-200)'">
+                <div style="font-size:22px; margin-bottom:0.4rem;">&#127979;</div>
+                <h5 style="font-size:14px; font-weight:800; color:var(--black);">School Delivery Status</h5>
+                <p style="font-size:12px; color:var(--grey-600); margin-top:0.3rem;">Per-school delivery &amp; shortfall report</p>
+                <div style="margin-top:0.6rem; display:flex; gap:0.4rem;"><span class="badge pink">Last: Today</span><span class="badge grey">Excel · PDF</span></div>
+              </div>
+              <div style="padding:14px; border:2px solid var(--grey-200); border-radius:12px; cursor:pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--pink-primary)'" onmouseout="this.style.borderColor='var(--grey-200)'">
+                <div style="font-size:22px; margin-bottom:0.4rem;">&#127974;</div>
+                <h5 style="font-size:14px; font-weight:800; color:var(--black);">Supplier Performance</h5>
+                <p style="font-size:12px; color:var(--grey-600); margin-top:0.3rem;">SLAs, penalties &amp; ratings (BEE)</p>
+                <div style="margin-top:0.6rem; display:flex; gap:0.4rem;"><span class="badge pink">Last: 22 Jan</span><span class="badge grey">Excel · PDF</span></div>
+              </div>
+              <div style="padding:14px; border:2px solid var(--grey-200); border-radius:12px; cursor:pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--pink-primary)'" onmouseout="this.style.borderColor='var(--grey-200)'">
+                <div style="font-size:22px; margin-bottom:0.4rem;">&#128737;</div>
+                <h5 style="font-size:14px; font-weight:800; color:var(--black);">Risk &amp; Assurance Report</h5>
+                <p style="font-size:12px; color:var(--grey-600); margin-top:0.3rem;">Full register, mitigations &amp; actions</p>
+                <div style="margin-top:0.6rem; display:flex; gap:0.4rem;"><span class="badge pink">Last: 19 Jan</span><span class="badge grey">PDF · Excel</span></div>
+              </div>
+              <div style="padding:14px; border:2px solid var(--grey-200); border-radius:12px; cursor:pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--pink-primary)'" onmouseout="this.style.borderColor='var(--grey-200)'">
+                <div style="font-size:22px; margin-bottom:0.4rem;">&#128220;</div>
+                <h5 style="font-size:14px; font-weight:800; color:var(--black);">Contract Compliance</h5>
+                <p style="font-size:12px; color:var(--grey-600); margin-top:0.3rem;">Obligations, renewals &amp; variations</p>
+                <div style="margin-top:0.6rem; display:flex; gap:0.4rem;"><span class="badge pink">Last: 20 Jan</span><span class="badge grey">PDF · Excel</span></div>
+              </div>
+              <div style="padding:14px; border:2px solid var(--grey-200); border-radius:12px; cursor:pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--pink-primary)'" onmouseout="this.style.borderColor='var(--grey-200)'">
+                <div style="font-size:22px; margin-bottom:0.4rem;">&#129309;</div>
+                <h5 style="font-size:14px; font-weight:800; color:var(--black);">Stakeholder Report (NGO)</h5>
+                <p style="font-size:12px; color:var(--grey-600); margin-top:0.3rem;">Municipalities, LOVE HOWICK, etc.</p>
+                <div style="margin-top:0.6rem; display:flex; gap:0.4rem;"><span class="badge pink">Last: 18 Jan</span><span class="badge grey">PDF · PPTX</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Stakeholder Feedback &amp; Coverage</div>
+              <button class="card-action">Q3 2025/26</button>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1rem;">
+              <div class="qs-item" style="background:var(--pink-light); border-left-color:var(--pink-primary);">
+                <div class="qs-label">Principal Satisfaction</div>
+                <div class="qs-value">87.3%</div>
+                <div class="qs-sub">1,246 surveys · +5.1 pts</div>
+              </div>
+              <div class="qs-item" style="background:#d1fae5; border-left-color:var(--green);">
+                <div class="qs-label">Supplier Satisfaction</div>
+                <div class="qs-value">74.9%</div>
+                <div class="qs-sub">47 panel · +2.8 pts</div>
+              </div>
+              <div class="qs-item" style="background:#fef3c7; border-left-color:var(--amber);">
+                <div class="qs-label">Municipal Confidence</div>
+                <div class="qs-value">79.4%</div>
+                <div class="qs-sub">uMngeni + iLembe + 3</div>
+              </div>
+              <div class="qs-item" style="background:#fee2e2; border-left-color:var(--red);">
+                <div class="qs-label">NGO Intervention Load</div>
+                <div class="qs-value">28 active</div>
+                <div class="qs-sub">vs 46 (Oct) — good trend</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar p2">AG</div>
+              <div class="activity-content">
+                <p><strong>Auditor-General South Africa</strong> issued management letter — 3 minor findings, 0 material irregularities. Programme receives <strong>Unqualified</strong> opinion.</p>
+                <div class="activity-time">17 January 2026 · Audit</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar p3">LH</div>
+              <div class="activity-content">
+                <p><strong>LOVE HOWICK</strong> NGO completed 42 emergency drops in uMngeni municipality, feeding 18,200 learners for 2 weeks during supply disruption. Invoice submitted.</p>
+                <div class="activity-time">12 January 2026 · NGO Partner</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar p4">MU</div>
+              <div class="activity-content">
+                <p><strong>uMngeni Municipality</strong> approved joint road safety plan for 12 northern feeder routes — reduces access risk by an estimated 44%.</p>
+                <div class="activity-time">09 January 2026 · Municipal</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar p1">DBE</div>
+              <div class="activity-content">
+                <p><strong>National DBE</strong> quarterly review — KwaZulu-Natal ranked 3rd out of 9 provinces on NSNP delivery confidence index. Programmatic improvement plan endorsed.</p>
+                <div class="activity-time">06 January 2026 · Oversight</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ===== PAGE NAVIGATION ===== */
+  const pageConfig = {
+    login: { title: 'NutriChain', sub: 'Sign in to continue' },
+    executive: { title: 'Executive Dashboard', sub: 'KwaZulu-Natal National School Nutrition Programme (NSNP)' },
+    schedule: { title: 'Project Schedule', sub: 'Master Gantt · Milestones · Task Dependencies · 2025/26 Delivery Cycle' },
+    tender: { title: 'Tender Management Dashboard', sub: 'Procurement Funnel · Bid Evaluation · Awards · SCM Compliance' },
+    risk: { title: 'Risk Management Dashboard', sub: 'Risk Register · Heat-Map · Mitigation Plans · Contingency Reserve' },
+    contract: { title: 'Contract Management Dashboard', sub: 'Obligations · SLAs · Milestones · Renewals · Variations' },
+    reporting: { title: 'Overall Reporting Hub', sub: 'Consolidated EXCO · District · Stakeholder · Audit-Ready Reports' }
+  };
+
+  function goToPage(pageId) {
+    // Login page vs app shell
+    if (pageId === 'login') {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('login-page').classList.add('active');
+      return;
+    }
+    // Switch within the app shell
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('app-shell').classList.add('active');
+
+    // Hide all content sections
+    ['page-executive','page-schedule','page-tender','page-risk','page-contract','page-reporting']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    // Show target
+    const target = document.getElementById('page-' + pageId);
+    if (target) target.style.display = 'block';
+
+    // Update header
+    const cfg = pageConfig[pageId] || pageConfig.executive;
+    document.getElementById('page-header-title').textContent = cfg.title;
+    document.getElementById('page-header-sub').textContent = cfg.sub;
+
+    // Update sidebar
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const activeNav = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+    if (activeNav) activeNav.classList.add('active');
+
+    // Render charts for the selected page
+    setTimeout(renderChartsForPage.bind(null, pageId), 50);
+  }
+
+  /* ===== CHARTS ===== */
+  const chartInstances = {};
+  function makeChart(id, cfg) {
+    if (chartInstances[id]) { chartInstances[id].destroy(); }
+    const el = document.getElementById(id);
+    if (!el) return null;
+    chartInstances[id] = new Chart(el, cfg);
+    return chartInstances[id];
+  }
+  const PINK = '#ec4899', PINK_D = '#be185d', GREY = '#6b7280', GREY_L = '#e5e7eb', GREEN = '#10b981', AMBER = '#f59e0b', RED = '#ef4444', BLACK = '#111827';
+  const palette = [PINK, '#6366f1', GREEN, AMBER, RED, '#14b8a6', '#f97316', BLACK];
+
+  function renderChartsForPage(pageId) {
+    if (pageId === 'executive') renderExecutiveCharts();
+    else if (pageId === 'schedule') renderScheduleCharts();
+    else if (pageId === 'tender') renderTenderCharts();
+    else if (pageId === 'risk') renderRiskCharts();
+    else if (pageId === 'contract') renderContractCharts();
+    else if (pageId === 'reporting') renderReportingCharts();
+  }
+
+  function renderExecutiveCharts() {
+    makeChart('execTrendChart', {
+      type: 'line',
+      data: {
+        labels: ['Sep','Oct','Nov','Dec','Jan','Feb'],
+        datasets: [
+          { label: 'Schools Covered', data: [5410, 5520, 5612, 5680, 5800, 5842], borderColor: PINK, backgroundColor: 'rgba(236,72,153,0.12)', fill: true, tension: 0.35, yAxisID: 'y', pointRadius: 4 },
+          { label: 'Learners Fed (000s)', data: [1980, 2010, 2045, 2070, 2110, 2140], borderColor: BLACK, backgroundColor: 'rgba(17,24,39,0.08)', fill: true, tension: 0.35, yAxisID: 'y1', pointRadius: 4, borderDash: [4,2] },
+          { label: 'Delivery Issues', data: [62, 58, 51, 44, 41, 38], borderColor: RED, backgroundColor: 'rgba(239,68,68,0.08)', fill: true, tension: 0.35, yAxisID: 'y2', pointRadius: 4 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+          y: { position: 'left', grid: { color: GREY_L } },
+          y1: { position: 'right', grid: { drawOnChartArea: false } },
+          y2: { display: false },
+          x: { grid: { display: false } }
+        },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }
+      }
+    });
+    makeChart('execDonutChart', {
+      type: 'doughnut',
+      data: {
+        labels: ['On Track','Minor Delays','Critical'],
+        datasets: [{ data: [71, 21, 8], backgroundColor: [GREEN, AMBER, RED], borderWidth: 3, borderColor: '#fff' }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  function renderScheduleCharts() {
+    makeChart('scheduleBarChart', {
+      type: 'bar',
+      data: {
+        labels: ['Procurement','Onboarding','Logistics','Risk & Compliance','Stakeholder','ICT Enablement','Emergency'],
+        datasets: [
+          { label: 'Complete', data: [8,4,9,4,6,5,4], backgroundColor: GREEN, borderRadius: 6 },
+          { label: 'In Progress', data: [4,2,2,3,2,2,2], backgroundColor: PINK, borderRadius: 6 },
+          { label: 'Pending', data: [1,0,0,0,0,0,0], backgroundColor: AMBER, borderRadius: 6 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          x: { stacked: true, grid: { display: false } },
+          y: { stacked: true, grid: { color: GREY_L } }
+        },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }
+      }
+    });
+  }
+
+  function renderTenderCharts() {
+    makeChart('tenderFunnelChart', {
+      type: 'bar',
+      data: {
+        labels: ['Opportunities Identified','Published & Advertised','Bids Received','Evaluation','Awards Made','Contracts Signed'],
+        datasets: [{
+          data: [32, 27, 217, 21, 12, 12],
+          backgroundColor: [BLACK, '#374151', GREY, AMBER, PINK, GREEN],
+          borderRadius: 8,
+          barThickness: 22
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} items` } }
+        },
+        scales: {
+          x: { grid: { color: GREY_L } },
+          y: { grid: { display: false } }
+        }
+      }
+    });
+    makeChart('tenderCategoryChart', {
+      type: 'polarArea',
+      data: {
+        labels: ['Staples','Fresh Produce','Protein','Dairy','Bakery','Logistics','Equipment'],
+        datasets: [{
+          data: [412, 384, 312, 214, 156, 142, 68],
+          backgroundColor: palette.map(c => c + 'cc'),
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } },
+        scales: { r: { beginAtZero: true, grid: { color: GREY_L } } }
+      }
+    });
+  }
+
+  function renderRiskCharts() {
+    makeChart('riskTrendChart', {
+      type: 'line',
+      data: {
+        labels: ['W1','W2','W3','W4','W5','W6','W7','W8'],
+        datasets: [
+          { label: 'Critical / Red', data: [7,6,6,5,5,4,4,4], borderColor: RED, backgroundColor: 'rgba(239,68,68,0.12)', fill: true, tension: 0.35, pointRadius: 4 },
+          { label: 'Medium / Amber', data: [14,15,14,13,12,12,11,11], borderColor: AMBER, backgroundColor: 'rgba(245,158,11,0.12)', fill: true, tension: 0.35, pointRadius: 4 },
+          { label: 'Low / Green', data: [5,6,6,7,7,8,8,8], borderColor: GREEN, backgroundColor: 'rgba(16,185,129,0.12)', fill: true, tension: 0.35, pointRadius: 4 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          y: { beginAtZero: true, grid: { color: GREY_L } },
+          x: { grid: { display: false } }
+        },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }
+      }
+    });
+  }
+
+  function renderContractCharts() {
+    makeChart('contractTypeChart', {
+      type: 'doughnut',
+      data: {
+        labels: ['Staple Foods','Fresh Produce','Protein','Dairy','Logistics','Bakery SMME','Equipment','Other'],
+        datasets: [{
+          data: [28, 18, 15, 12, 10, 9, 5, 3],
+          backgroundColor: palette,
+          borderWidth: 3,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 11 } } } }
+      }
+    });
+  }
+
+  function renderReportingCharts() {
+    makeChart('districtRadarChart', {
+      type: 'radar',
+      data: {
+        labels: ['Delivery','Quality','SLA','Stability','Complaint Resolution','Reporting'],
+        datasets: [
+          { label: 'uMgungundlovu', data: [92, 88, 90, 86, 84, 91], backgroundColor: 'rgba(236,72,153,0.2)', borderColor: PINK, pointBackgroundColor: PINK, borderWidth: 2 },
+          { label: 'uThukela', data: [82, 79, 81, 77, 80, 83], backgroundColor: 'rgba(17,24,39,0.12)', borderColor: BLACK, pointBackgroundColor: BLACK, borderWidth: 2 },
+          { label: 'iLembe', data: [68, 72, 65, 61, 74, 70], backgroundColor: 'rgba(245,158,11,0.2)', borderColor: AMBER, pointBackgroundColor: AMBER, borderWidth: 2 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } },
+        scales: { r: { suggestedMin: 50, suggestedMax: 100, grid: { color: GREY_L } } }
+      }
+    });
+    makeChart('budgetChart', {
+      type: 'bar',
+      data: {
+        labels: ['Q1','Q2','Q3','Q4 (F)'],
+        datasets: [
+          { label: 'Budgeted', data: [580, 610, 660, 660], backgroundColor: GREY, borderRadius: 6 },
+          { label: 'Actual', data: [562, 598, 660, 0], backgroundColor: PINK, borderRadius: 6 },
+          { label: 'Contingency Used', data: [8, 15, 34, 0], backgroundColor: RED, borderRadius: 6 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          y: { grid: { color: GREY_L }, title: { display: true, text: 'R Millions', font: { size: 11 } } },
+          x: { grid: { display: false } }
+        },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }
+      }
+    });
+    makeChart('quintileChart', {
+      type: 'bar',
+      data: {
+        labels: ['Quintile 1','Quintile 2','Quintile 3','Quintile 4','Quintile 5'],
+        datasets: [
+          { label: 'Schools', data: [2410, 1812, 1022, 498, 100], backgroundColor: PINK, borderRadius: 6 },
+          { label: 'Learners (000s)', data: [980, 680, 340, 122, 18], backgroundColor: BLACK, borderRadius: 6 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          y: { grid: { color: GREY_L } },
+          x: { grid: { display: false } }
+        },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  });
+</script>
+</body>
+</html>
